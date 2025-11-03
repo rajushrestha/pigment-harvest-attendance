@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAuthToken, getAuthCookieName } from "@/lib/auth";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 	// Allow public access to welcome, login and API routes
 	if (
 		request.nextUrl.pathname === "/welcome" ||
