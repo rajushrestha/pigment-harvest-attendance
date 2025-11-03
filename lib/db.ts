@@ -1,23 +1,34 @@
 import { eq, and, sql, gte, lte, inArray } from "drizzle-orm";
 import { getDatabase, timeEntriesCache, holidays, userVisibility, type Holiday, type UserVisibility } from "./db/index";
-import type { HarvestTimeEntry } from "./harvest";
+import type { CachedTimeEntry } from "./types";
 
-export interface CachedTimeEntry {
-	entry_id: number;
+// Local type definition to avoid importing from harvest.ts (which uses Node.js APIs)
+interface HarvestTimeEntry {
+	id: number;
 	spent_date: string;
-	user_id: number;
-	user_name: string;
-	project_id: number;
-	project_name: string;
-	client_id: number;
-	client_name: string;
-	task_id: number;
-	task_name: string;
-	notes: string | null;
+	user: {
+		id: number;
+		name: string;
+	};
+	project: {
+		id: number;
+		name: string;
+	};
+	client: {
+		id: number;
+		name: string;
+	};
+	task: {
+		id: number;
+		name: string;
+	};
+	notes: string;
 	hours: number;
-	billable: number;
-	overtime: number;
+	billable: boolean;
 }
+
+// Re-export for backwards compatibility
+export type { CachedTimeEntry } from "./types";
 
 export async function storeTimeEntries(
 	entries: HarvestTimeEntry[],

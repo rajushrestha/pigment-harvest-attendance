@@ -3,8 +3,8 @@ import {
 	storeTimeEntries,
 	clearCacheForDateRange,
 	getCacheInfo,
-	type CachedTimeEntry,
 } from "./db";
+import type { CachedTimeEntry } from "./types";
 import {
 	fetchTimeEntries as fetchTimeEntriesFromAPI,
 	type HarvestTimeEntry,

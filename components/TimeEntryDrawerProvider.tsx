@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { type HarvestTimeEntry } from "@/lib/harvest";
+import { type TimeEntryWithOvertime } from "@/lib/timeEntriesCache";
 import { TimeEntryDrawer } from "./TimeEntryDrawer";
 import { formatDate } from "@/lib/utils";
 
 interface DateEntry {
 	date: Date;
 	dateStr: string;
-	entries: HarvestTimeEntry[];
+	entries: TimeEntryWithOvertime[];
 	totalHours: number;
 }
 
@@ -17,6 +17,8 @@ interface TimeEntryDrawerProviderProps {
 	userName: string;
 	userEmail: string;
 	datesWithEntries: Map<string, DateEntry>;
+	dateRangeStart: string;
+	dateRangeEnd: string;
 }
 
 export function TimeEntryDrawerProvider({
@@ -24,6 +26,8 @@ export function TimeEntryDrawerProvider({
 	userName,
 	userEmail,
 	datesWithEntries,
+	dateRangeStart,
+	dateRangeEnd,
 }: TimeEntryDrawerProviderProps) {
 	const [currentDateStr, setCurrentDateStr] = useState<string | null>(null);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -95,6 +99,8 @@ export function TimeEntryDrawerProvider({
 					onNext={() => navigateToDate("next")}
 					hasPrevious={hasPrevious}
 					hasNext={hasNext}
+					dateRangeStart={dateRangeStart}
+					dateRangeEnd={dateRangeEnd}
 				/>
 			)}
 		</>

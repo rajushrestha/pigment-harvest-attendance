@@ -34,7 +34,15 @@ export async function verifyAuthToken(token: string): Promise<AuthTokenPayload |
 			return null;
 		}
 
-		return payload as AuthTokenPayload;
+		// Validate email exists in payload
+		if (!payload.email || typeof payload.email !== "string") {
+			return null;
+		}
+
+		return {
+			email: payload.email,
+			exp,
+		};
 	} catch (error) {
 		return null;
 	}

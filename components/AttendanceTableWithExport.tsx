@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import { AttendanceTable } from "./AttendanceTable";
 import { ExportButtons } from "./ExportButtons";
-import type { HarvestTimeEntry } from "@/lib/harvest";
+import type { TimeEntryWithOvertime } from "@/lib/timeEntriesCache";
 
 interface AttendanceTableWithExportProps {
 	allUsers: Array<{
@@ -18,9 +18,9 @@ interface AttendanceTableWithExportProps {
 				string,
 				{
 					date: string;
-					entries: any[];
+					entries: TimeEntryWithOvertime[];
 					totalHours: number;
-					totalOvertime?: number;
+					totalOvertime: number;
 				}
 			>;
 		};

@@ -5,7 +5,7 @@ import { UserRow } from "./UserRow";
 import { UserVisibilityRow } from "./UserVisibilityRow";
 import { Legend } from "./Legend";
 import { formatDate, isWeekend } from "@/lib/utils";
-import type { HarvestTimeEntry } from "@/lib/harvest";
+import type { TimeEntryWithOvertime } from "@/lib/timeEntriesCache";
 
 interface AttendanceTableProps {
 	allUsers: Array<{
@@ -20,12 +20,17 @@ interface AttendanceTableProps {
 				string,
 				{
 					date: string;
-					entries: any[];
+					entries: TimeEntryWithOvertime[];
 					totalHours: number;
-					totalOvertime?: number;
+					totalOvertime: number;
 				}
 			>;
 		};
+	}>;
+	allUsersForVisibility: Array<{
+		id: number;
+		name: string;
+		email: string;
 	}>;
 	daysInMonth: Date[];
 	holidaysSet: Set<string>;
@@ -36,8 +41,8 @@ interface AttendanceTableProps {
 
 export const AttendanceTable = forwardRef<
 	{
-		tableRef: React.RefObject<HTMLDivElement>;
-		legendRef: React.RefObject<HTMLDivElement>;
+		tableRef: React.RefObject<HTMLDivElement | null>;
+		legendRef: React.RefObject<HTMLDivElement | null>;
 	},
 	AttendanceTableProps
 >(

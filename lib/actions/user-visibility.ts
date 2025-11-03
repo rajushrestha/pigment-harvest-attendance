@@ -1,10 +1,6 @@
 "use server";
 
-import {
-	getAllUserVisibility,
-	setMultipleUserVisibility,
-	type UserVisibility,
-} from "@/lib/db";
+import { getAllUserVisibility, setMultipleUserVisibility } from "@/lib/db";
 
 export async function getAllUserVisibilityAction(): Promise<Map<string, boolean>> {
 	return await getAllUserVisibility();

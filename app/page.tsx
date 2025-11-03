@@ -80,13 +80,11 @@ function groupTimeEntriesByUserAndDate(
 export default async function AttendancePage({
 	searchParams,
 }: {
-	searchParams:
-		| Promise<{
-				month?: string;
-				year?: string;
-				refetch?: string;
-		  }>
-		| { month?: string; year?: string; refetch?: string };
+	searchParams: Promise<{
+		month?: string;
+		year?: string;
+		refetch?: string;
+	}>;
 }) {
 	// Check authentication
 	const email = await getAuthenticatedEmail();
@@ -94,9 +92,8 @@ export default async function AttendancePage({
 		redirect("/welcome");
 	}
 
-	// Handle both sync and async searchParams (Next.js 16 compatibility)
-	const resolvedSearchParams =
-		searchParams instanceof Promise ? await searchParams : searchParams;
+	// Handle async searchParams (Next.js 16 compatibility)
+	const resolvedSearchParams = await searchParams;
 
 	const today = new Date();
 	const selectedMonth = resolvedSearchParams.month
@@ -213,17 +210,20 @@ export default async function AttendancePage({
 		return true;
 	});
 
-	const allUsers = filteredUsers.map((user) => ({
-		id: user.id,
-		name: `${user.first_name} ${user.last_name}`,
-		email: user.email,
-		attendance: userAttendanceMap.get(user.id) || {
-			userId: user.id,
-			userName: `${user.first_name} ${user.last_name}`,
+	const allUsers = filteredUsers.map((user) => {
+		const attendance = userAttendanceMap.get(user.id);
+		return {
+			id: user.id,
+			name: `${user.first_name} ${user.last_name}`,
 			email: user.email,
-			dailyEntries: new Map(),
-		},
-	}));
+			attendance: attendance || {
+				userId: user.id,
+				userName: `${user.first_name} ${user.last_name}`,
+				email: user.email,
+				dailyEntries: new Map<string, TimeEntryGroup>(),
+			},
+		};
+	});
 
 	return (
 		<div className="min-h-screen bg-zinc-50 dark:bg-black p-4 md:p-8">

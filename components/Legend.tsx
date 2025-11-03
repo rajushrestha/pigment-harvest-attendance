@@ -8,7 +8,7 @@ interface LegendProps {
 		weekend: boolean;
 		worked: boolean;
 		absent: boolean;
-		overtime?: boolean;
+		overtime: boolean;
 	}) => void;
 	exportButtons?: React.ReactNode;
 }
