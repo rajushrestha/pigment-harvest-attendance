@@ -2,6 +2,7 @@
 
 import { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { UserRow } from "./UserRow";
+import { UserVisibilityRow } from "./UserVisibilityRow";
 import { Legend } from "./Legend";
 import { formatDate, isWeekend } from "@/lib/utils";
 import type { HarvestTimeEntry } from "@/lib/harvest";
@@ -43,6 +44,7 @@ export const AttendanceTable = forwardRef<
 	(
 		{
 			allUsers,
+			allUsersForVisibility,
 			daysInMonth,
 			holidaysSet,
 			dateRangeStart,
@@ -129,6 +131,14 @@ export const AttendanceTable = forwardRef<
 									filters={filters}
 								/>
 							))}
+							<UserVisibilityRow
+								users={allUsersForVisibility}
+								daysInMonth={daysInMonth}
+								onVisibilityChange={() => {
+									// Trigger a page refresh to update visible users
+									window.location.reload();
+								}}
+							/>
 						</tbody>
 					</table>
 				</div>

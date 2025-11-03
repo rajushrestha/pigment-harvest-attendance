@@ -15,6 +15,13 @@
       "when": 1762175900317,
       "tag": "0001_clear_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1762178466571,
+      "tag": "0002_odd_proemial_gods",
+      "breakpoints": true
     }
   ]
 }

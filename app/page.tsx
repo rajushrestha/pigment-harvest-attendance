@@ -16,7 +16,10 @@ import { RefetchToggle } from "@/components/RefetchToggle";
 import { HolidaySelector } from "@/components/HolidaySelector";
 import { RefetchRedirectHandler } from "@/components/RefetchRedirectHandler";
 import { getHolidaysForRange } from "@/lib/actions/holidays";
-import { getCacheInfo } from "@/lib/db";
+import { getCacheInfo, getAllUserVisibility } from "@/lib/db";
+import { getAuthenticatedEmail } from "@/lib/auth-utils";
+import { redirect } from "next/navigation";
+import { LogoutButton } from "@/components/LogoutButton";
 
 interface TimeEntryGroup {
 	date: string;
@@ -81,11 +84,16 @@ export default async function AttendancePage({
 		| Promise<{
 				month?: string;
 				year?: string;
-				emails?: string;
 				refetch?: string;
 		  }>
-		| { month?: string; year?: string; emails?: string; refetch?: string };
+		| { month?: string; year?: string; refetch?: string };
 }) {
+	// Check authentication
+	const email = await getAuthenticatedEmail();
+	if (!email) {
+		redirect("/welcome");
+	}
+
 	// Handle both sync and async searchParams (Next.js 16 compatibility)
 	const resolvedSearchParams =
 		searchParams instanceof Promise ? await searchParams : searchParams;
@@ -97,9 +105,6 @@ export default async function AttendancePage({
 	const selectedYear = resolvedSearchParams.year
 		? parseInt(resolvedSearchParams.year)
 		: today.getFullYear();
-	const selectedEmails = resolvedSearchParams.emails
-		? resolvedSearchParams.emails.split(",").filter(Boolean)
-		: [];
 	const forceRefresh = resolvedSearchParams.refetch === "true";
 
 	// Validate month and year
@@ -192,11 +197,21 @@ export default async function AttendancePage({
 	// Get all active users (including those without entries)
 	const allActiveUsers = users.filter((user) => user.is_active);
 
-	// Filter users by email if emails are specified
-	const filteredUsers =
-		selectedEmails.length > 0
-			? allActiveUsers.filter((user) => selectedEmails.includes(user.email))
-			: allActiveUsers;
+	// Get user visibility settings
+	const userVisibilityMap = await getAllUserVisibility();
+
+	// Filter users by visibility
+	const filteredUsers = allActiveUsers.filter((user) => {
+		// Check if user is visible (default to true if not set)
+		// Normalize email to lowercase for lookup (matching database storage)
+		const normalizedEmail = user.email.toLowerCase().trim();
+		const isVisible = userVisibilityMap.get(normalizedEmail) ?? true;
+		if (!isVisible) {
+			return false;
+		}
+
+		return true;
+	});
 
 	const allUsers = filteredUsers.map((user) => ({
 		id: user.id,
@@ -208,13 +223,6 @@ export default async function AttendancePage({
 			email: user.email,
 			dailyEntries: new Map(),
 		},
-	}));
-
-	// Prepare user list for filter component
-	const userListForFilter = allActiveUsers.map((user) => ({
-		id: user.id,
-		name: `${user.first_name} ${user.last_name}`,
-		email: user.email,
 	}));
 
 	return (
@@ -230,13 +238,18 @@ export default async function AttendancePage({
 							{monthNames[month]} {year}
 						</p>
 					</div>
-					<Suspense
-						fallback={
-							<div className="text-zinc-600 dark:text-zinc-400">Loading...</div>
-						}
-					>
-						<RefetchToggle cachedAt={cacheInfo.cachedAt} />
-					</Suspense>
+					<div className="flex items-center gap-4">
+						<Suspense
+							fallback={
+								<div className="text-zinc-600 dark:text-zinc-400">
+									Loading...
+								</div>
+							}
+						>
+							<RefetchToggle cachedAt={cacheInfo.cachedAt} />
+						</Suspense>
+						<LogoutButton />
+					</div>
 				</div>
 
 				<div className="flex flex-wrap items-center gap-4">
@@ -245,7 +258,7 @@ export default async function AttendancePage({
 							<div className="text-zinc-600 dark:text-zinc-400">Loading...</div>
 						}
 					>
-						<MonthSelector users={userListForFilter} />
+						<MonthSelector />
 					</Suspense>
 					<Suspense
 						fallback={
@@ -263,6 +276,11 @@ export default async function AttendancePage({
 
 			<AttendanceTableWithExport
 				allUsers={allUsers}
+				allUsersForVisibility={allActiveUsers.map((user) => ({
+					id: user.id,
+					name: `${user.first_name} ${user.last_name}`,
+					email: user.email,
+				}))}
 				daysInMonth={daysInMonth}
 				holidaysSet={holidaysSet}
 				month={monthNames[month]}

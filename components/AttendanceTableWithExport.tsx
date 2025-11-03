@@ -25,6 +25,11 @@ interface AttendanceTableWithExportProps {
 			>;
 		};
 	}>;
+	allUsersForVisibility: Array<{
+		id: number;
+		name: string;
+		email: string;
+	}>;
 	daysInMonth: Date[];
 	holidaysSet: Set<string>;
 	month: string;
@@ -35,6 +40,7 @@ interface AttendanceTableWithExportProps {
 
 export function AttendanceTableWithExport({
 	allUsers,
+	allUsersForVisibility,
 	daysInMonth,
 	holidaysSet,
 	month,
@@ -72,6 +78,7 @@ export function AttendanceTableWithExport({
 		<AttendanceTable
 			ref={tableWrapperRef}
 			allUsers={allUsers}
+			allUsersForVisibility={allUsersForVisibility}
 			daysInMonth={daysInMonth}
 			holidaysSet={holidaysSet}
 			dateRangeStart={dateRangeStart}

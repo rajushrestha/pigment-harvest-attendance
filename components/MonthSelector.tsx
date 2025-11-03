@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { UserFilter } from "./UserFilter";
 
 const monthNames = [
 	"January",
@@ -18,11 +17,7 @@ const monthNames = [
 	"December",
 ];
 
-interface MonthSelectorProps {
-	users: Array<{ id: number; name: string; email: string }>;
-}
-
-export function MonthSelector({ users }: MonthSelectorProps) {
+export function MonthSelector() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
@@ -60,7 +55,7 @@ export function MonthSelector({ users }: MonthSelectorProps) {
 				className="px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				{monthNames.map((month, index) => (
-					<option key={index} value={index}>
+					<option key={month} value={index}>
 						{month}
 					</option>
 				))}
@@ -77,8 +72,6 @@ export function MonthSelector({ users }: MonthSelectorProps) {
 					</option>
 				))}
 			</select>
-
-			<UserFilter users={users} />
 		</div>
 	);
 }

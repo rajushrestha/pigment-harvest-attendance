@@ -1,5 +1,5 @@
-import { eq, and, sql, gte, lte } from "drizzle-orm";
-import { getDatabase, timeEntriesCache, holidays, type Holiday } from "./db/index";
+import { eq, and, sql, gte, lte, inArray } from "drizzle-orm";
+import { getDatabase, timeEntriesCache, holidays, userVisibility, type Holiday, type UserVisibility } from "./db/index";
 import type { HarvestTimeEntry } from "./harvest";
 
 export interface CachedTimeEntry {
@@ -267,4 +267,80 @@ export async function toggleOvertime(
 				eq(timeEntriesCache.dateRangeEnd, dateRangeEnd),
 			),
 		);
+}
+
+// User visibility functions
+export async function getUserVisibility(userEmail: string): Promise<boolean> {
+	const db = getDatabase();
+	const result = await db
+		.select({ isVisible: userVisibility.isVisible })
+		.from(userVisibility)
+		.where(eq(userVisibility.userEmail, userEmail.toLowerCase().trim()))
+		.limit(1);
+
+	// Default to visible if not found
+	return result[0]?.isVisible === 1 ? true : true;
+}
+
+export async function getAllUserVisibility(): Promise<Map<string, boolean>> {
+	const db = getDatabase();
+	const results = await db.select().from(userVisibility);
+
+	const visibilityMap = new Map<string, boolean>();
+	for (const row of results) {
+		visibilityMap.set(row.userEmail, row.isVisible === 1);
+	}
+
+	return visibilityMap;
+}
+
+export async function setUserVisibility(userEmail: string, isVisible: boolean): Promise<void> {
+	const db = getDatabase();
+	const now = Date.now();
+
+	await db
+		.insert(userVisibility)
+		.values({
+			userEmail: userEmail.toLowerCase().trim(),
+			isVisible: isVisible ? 1 : 0,
+			updatedAt: now,
+		})
+		.onConflictDoUpdate({
+			target: userVisibility.userEmail,
+			set: {
+				isVisible: isVisible ? 1 : 0,
+				updatedAt: now,
+			},
+		});
+}
+
+export async function toggleUserVisibility(userEmail: string): Promise<boolean> {
+	const currentVisibility = await getUserVisibility(userEmail);
+	const newVisibility = !currentVisibility;
+	await setUserVisibility(userEmail, newVisibility);
+	return newVisibility;
+}
+
+export async function setMultipleUserVisibility(visibilities: Array<{ email: string; isVisible: boolean }>): Promise<void> {
+	const db = getDatabase();
+	const now = Date.now();
+
+	await db.transaction(async (tx) => {
+		for (const { email, isVisible } of visibilities) {
+			await tx
+				.insert(userVisibility)
+				.values({
+					userEmail: email.toLowerCase().trim(),
+					isVisible: isVisible ? 1 : 0,
+					updatedAt: now,
+				})
+				.onConflictDoUpdate({
+					target: userVisibility.userEmail,
+					set: {
+						isVisible: isVisible ? 1 : 0,
+						updatedAt: now,
+					},
+				});
+		}
+	});
 }
