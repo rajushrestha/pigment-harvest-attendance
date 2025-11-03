@@ -1,0 +1,1 @@
+ALTER TABLE `time_entries_cache` ADD `overtime` integer DEFAULT 0 NOT NULL;
