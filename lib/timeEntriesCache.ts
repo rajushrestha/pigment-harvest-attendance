@@ -1,15 +1,14 @@
 import "server-only";
 
 import {
-	getCachedTimeEntries,
-	storeTimeEntries,
-	clearCacheForDateRange,
-	getCacheInfo,
+  clearCacheForDateRange,
+  getCachedTimeEntries,
+  getCacheInfo,
+  storeTimeEntries,
 } from "./db";
-import type { CachedTimeEntry } from "./types";
 import {
-	fetchTimeEntries as fetchTimeEntriesFromAPI,
-	type HarvestTimeEntry,
+  fetchTimeEntries as fetchTimeEntriesFromAPI,
+  type HarvestTimeEntry,
 } from "./harvest";
 
 export interface TimeEntryWithOvertime extends HarvestTimeEntry {

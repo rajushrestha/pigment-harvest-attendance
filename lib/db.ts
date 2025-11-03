@@ -1,7 +1,11 @@
-import "server-only";
-
-import { eq, and, sql, gte, lte, inArray } from "drizzle-orm";
-import { getDatabase, timeEntriesCache, holidays, userVisibility, type Holiday, type UserVisibility } from "./db/index";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { getDatabase } from "./db/index";
+import {
+	holidays,
+	timeEntriesCache,
+	userVisibility,
+	type Holiday,
+} from "./db/schema";
 import type { CachedTimeEntry } from "./types";
 
 // Local type definition to avoid importing from harvest.ts (which uses Node.js APIs)
@@ -193,10 +197,7 @@ export async function getHolidaysForDateRange(
 		.select({ date: holidays.date })
 		.from(holidays)
 		.where(
-			and(
-				gte(holidays.date, dateRangeStart),
-				lte(holidays.date, dateRangeEnd),
-			),
+			and(gte(holidays.date, dateRangeStart), lte(holidays.date, dateRangeEnd)),
 		)
 		.orderBy(holidays.date);
 
@@ -307,7 +308,10 @@ export async function getAllUserVisibility(): Promise<Map<string, boolean>> {
 	return visibilityMap;
 }
 
-export async function setUserVisibility(userEmail: string, isVisible: boolean): Promise<void> {
+export async function setUserVisibility(
+	userEmail: string,
+	isVisible: boolean,
+): Promise<void> {
 	const db = getDatabase();
 	const now = Date.now();
 
@@ -327,14 +331,18 @@ export async function setUserVisibility(userEmail: string, isVisible: boolean): 
 		});
 }
 
-export async function toggleUserVisibility(userEmail: string): Promise<boolean> {
+export async function toggleUserVisibility(
+	userEmail: string,
+): Promise<boolean> {
 	const currentVisibility = await getUserVisibility(userEmail);
 	const newVisibility = !currentVisibility;
 	await setUserVisibility(userEmail, newVisibility);
 	return newVisibility;
 }
 
-export async function setMultipleUserVisibility(visibilities: Array<{ email: string; isVisible: boolean }>): Promise<void> {
+export async function setMultipleUserVisibility(
+	visibilities: Array<{ email: string; isVisible: boolean }>,
+): Promise<void> {
 	const db = getDatabase();
 	const now = Date.now();
 

@@ -1,11 +1,11 @@
 "use server";
 
 import {
-	getAllHolidays,
-	addHoliday,
-	removeHoliday,
-	toggleHoliday as toggleHolidayInDb,
-	getHolidaysForDateRange,
+  addHoliday,
+  getAllHolidays,
+  getHolidaysForDateRange,
+  removeHoliday,
+  toggleHoliday as toggleHolidayInDb,
 } from "@/lib/db";
 
 export async function getHolidays() {

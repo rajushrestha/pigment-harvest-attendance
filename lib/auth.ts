@@ -1,7 +1,10 @@
+import "dotenv/config";
 import { SignJWT, jwtVerify } from "jose";
 
 const SECRET_KEY = new TextEncoder().encode(
-	process.env.AUTH_SECRET || process.env.RESEND_API_KEY || "default-secret-change-in-production",
+	process.env.AUTH_SECRET ||
+		process.env.RESEND_API_KEY ||
+		"default-secret-change-in-production",
 );
 
 const TOKEN_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -24,7 +27,9 @@ export async function generateAuthToken(email: string): Promise<string> {
 	return token;
 }
 
-export async function verifyAuthToken(token: string): Promise<AuthTokenPayload | null> {
+export async function verifyAuthToken(
+	token: string,
+): Promise<AuthTokenPayload | null> {
 	try {
 		const { payload } = await jwtVerify(token, SECRET_KEY);
 		const exp = (payload.exp as number) * 1000; // Convert to milliseconds

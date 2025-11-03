@@ -14,8 +14,6 @@
 	},
 	"dependencies": {
 		"@libsql/client": "^0.15.15",
-		"@tursodatabase/sync": "^0.3.2",
-		"better-sqlite3": "^12.4.1",
 		"drizzle-orm": "^0.44.7",
 		"html2canvas": "^1.4.1",
 		"jose": "^6.1.0",
@@ -39,5 +37,6 @@
 		"tailwindcss": "^4",
 		"tsx": "^4.20.6",
 		"typescript": "^5"
-	}
+	},
+	"packageManager": "bun@1.2.0"
 }
