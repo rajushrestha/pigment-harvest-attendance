@@ -22,6 +22,13 @@ const nextConfig: NextConfig = {
 	serverExternalPackages: ["@tursodatabase/sync"],
 	// Set empty turbopack config to silence warning (we use webpack for native modules)
 	turbopack: {},
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

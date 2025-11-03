@@ -1,3 +1,5 @@
+import "server-only";
+
 const HARVEST_API_BASE = 'https://api.harvestapp.com/v2';
 
 function getHarvestHeaders(): Record<string, string> {

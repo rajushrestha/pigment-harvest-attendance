@@ -1,3 +1,5 @@
+import "server-only";
+
 import { eq, and, sql, gte, lte, inArray } from "drizzle-orm";
 import { getDatabase, timeEntriesCache, holidays, userVisibility, type Holiday, type UserVisibility } from "./db/index";
 import type { CachedTimeEntry } from "./types";
