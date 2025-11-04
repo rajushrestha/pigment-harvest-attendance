@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getAuthCookieName, verifyAuthToken } from "./auth";
+import { getAuthCookieName, verifyAuthToken } from "@/lib/auth";
 
 export async function getAuthenticatedEmail(): Promise<string | null> {
 	const cookieStore = await cookies();

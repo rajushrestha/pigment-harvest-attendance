@@ -1,12 +1,12 @@
 import { and, eq, gte, lte, sql } from "drizzle-orm";
-import { getDatabase } from "./db/index";
+import { getDatabase } from "@/lib/db/index";
 import {
 	holidays,
 	timeEntriesCache,
 	userVisibility,
 	type Holiday,
-} from "./db/schema";
-import type { CachedTimeEntry } from "./types";
+} from "@/lib/db/schema";
+import type { CachedTimeEntry } from "@/lib/types";
 
 // Local type definition to avoid importing from harvest.ts (which uses Node.js APIs)
 interface HarvestTimeEntry {
@@ -34,7 +34,7 @@ interface HarvestTimeEntry {
 }
 
 // Re-export for backwards compatibility
-export type { CachedTimeEntry } from "./types";
+export type { CachedTimeEntry } from "@/lib/types";
 
 export async function storeTimeEntries(
 	entries: HarvestTimeEntry[],

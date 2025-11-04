@@ -25,7 +25,6 @@
 *.pem
 
 # database
-db/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
