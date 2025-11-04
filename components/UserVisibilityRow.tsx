@@ -6,6 +6,7 @@ import {
 	getAllUserVisibilityAction,
 	updateUserVisibilityAction,
 } from "@/lib/actions/user-visibility";
+import { isSuperAdmin } from "@/lib/allowed-emails";
 
 interface User {
 	id: number;
@@ -16,14 +17,17 @@ interface User {
 interface UserVisibilityRowProps {
 	users: User[];
 	daysInMonth: Date[];
+	currentUserEmail?: string | null;
 	onVisibilityChange?: () => void;
 }
 
 export function UserVisibilityRow({
 	users,
 	daysInMonth,
+	currentUserEmail,
 	onVisibilityChange,
 }: UserVisibilityRowProps) {
+	const isSuperAdminUser = currentUserEmail ? isSuperAdmin(currentUserEmail) : false;
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [visibilityMap, setVisibilityMap] = useState<Map<string, boolean>>(
 		new Map(),
@@ -96,21 +100,22 @@ export function UserVisibilityRow({
 
 	return (
 		<>
-			<tr className="bg-zinc-50 dark:bg-zinc-800/50 border-t-2 border-zinc-400 dark:border-zinc-600">
-				<td className="border border-zinc-300 dark:border-zinc-700 p-3 sticky left-0 bg-zinc-50 dark:bg-zinc-800/50 z-10">
-					<button
-						type="button"
-						onClick={() => setIsDialogOpen(true)}
-						className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex flex-col items-center"
-					>
-						Show/Hide Users
-						{!isLoading && (
-							<span className="text-xs opacity-75">
-								({visibleCount}/{totalCount} visible)
-							</span>
-						)}
-					</button>
-				</td>
+			{isSuperAdminUser && (
+				<tr className="bg-zinc-50 dark:bg-zinc-800/50 border-t-2 border-zinc-400 dark:border-zinc-600">
+					<td className="border border-zinc-300 dark:border-zinc-700 p-3 sticky left-0 bg-zinc-50 dark:bg-zinc-800/50 z-10">
+						<button
+							type="button"
+							onClick={() => setIsDialogOpen(true)}
+							className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex flex-col items-center"
+						>
+							Show/Hide Users
+							{!isLoading && (
+								<span className="text-xs opacity-75">
+									({visibleCount}/{totalCount} visible)
+								</span>
+							)}
+						</button>
+					</td>
 				{/* Empty cells for date columns */}
 				{daysInMonth.map((day) => (
 					<td
@@ -120,12 +125,13 @@ export function UserVisibilityRow({
 				))}
 				{/* Separator */}
 				<td className="border-l-2 border-l-zinc-400 dark:border-l-zinc-600 bg-zinc-50 dark:bg-zinc-800/50 p-0"></td>
-				{/* Empty cells for total columns */}
-				<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
-				<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
-				<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
-				<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
-			</tr>
+					{/* Empty cells for total columns */}
+					<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
+					<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
+					<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
+					<td className="border border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50 dark:bg-zinc-800/50"></td>
+				</tr>
+			)}
 
 			{mounted &&
 				isDialogOpen &&

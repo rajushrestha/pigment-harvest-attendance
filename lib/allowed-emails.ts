@@ -19,3 +19,8 @@ export function isEmailAllowed(email: string): boolean {
 	const allowedEmails = getAllowedEmails();
 	return allowedEmails.includes(email.toLowerCase().trim());
 }
+
+export function isSuperAdmin(email: string): boolean {
+	const allowedEmails = ["raju@lunover.com"];
+	return allowedEmails.includes(email.toLowerCase().trim());
+}

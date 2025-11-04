@@ -36,6 +36,7 @@ interface AttendanceTableProps {
 	holidaysSet: Set<string>;
 	dateRangeStart: string;
 	dateRangeEnd: string;
+	currentUserEmail?: string | null;
 	exportButtons?: React.ReactNode;
 }
 
@@ -54,6 +55,7 @@ export const AttendanceTable = forwardRef<
 			holidaysSet,
 			dateRangeStart,
 			dateRangeEnd,
+			currentUserEmail,
 			exportButtons,
 		},
 		ref,
@@ -139,6 +141,7 @@ export const AttendanceTable = forwardRef<
 							<UserVisibilityRow
 								users={allUsersForVisibility}
 								daysInMonth={daysInMonth}
+								currentUserEmail={currentUserEmail}
 								onVisibilityChange={() => {
 									// Trigger a page refresh to update visible users
 									window.location.reload();

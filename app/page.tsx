@@ -287,6 +287,7 @@ export default async function AttendancePage({
 				year={year}
 				dateRangeStart={monthStart}
 				dateRangeEnd={monthEnd}
+				currentUserEmail={email}
 			/>
 		</div>
 	);
