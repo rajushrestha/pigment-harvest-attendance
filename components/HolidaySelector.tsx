@@ -1,9 +1,22 @@
 "use client";
 
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { addHolidayAction, removeHolidayAction } from "@/lib/actions/holidays";
-import { formatDate, getDaysInMonth, getMonthYear } from "@/lib/utils";
+import {
+	formatDate,
+	getDaysInMonth,
+	getMonthYear,
+	isWeekend,
+} from "@/lib/utils";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface HolidaySelectorProps {
 	month: number;
@@ -26,7 +39,6 @@ export function HolidaySelector({
 	);
 	const [isSaving, setIsSaving] = useState(false);
 	const [hasChanges, setHasChanges] = useState(false);
-	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const { month: daysMonth, year: daysYear } = getMonthYear(
 		new Date(year, month, 1),
@@ -55,23 +67,6 @@ export function HolidaySelector({
 		setPendingHolidays(new Set(initialHolidays));
 		setHasChanges(false);
 	}, [initialHolidays]);
-
-	// Close dropdown when clicking outside
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Node)
-			) {
-				setIsOpen(false);
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, []);
 
 	const handleToggleHoliday = useCallback(
 		(date: Date) => {
@@ -112,7 +107,7 @@ export function HolidaySelector({
 			}
 
 			// Apply all changes
-			const promises: Promise<any>[] = [];
+			const promises: Promise<{ success: boolean }>[] = [];
 			for (const date of toAdd) {
 				promises.push(addHolidayAction(date));
 			}
@@ -147,163 +142,130 @@ export function HolidaySelector({
 	}, [holidays]);
 
 	return (
-		<div className="inline-flex items-center" ref={dropdownRef}>
-			<div className="relative ml-2">
-				<button
-					type="button"
-					onClick={() => setIsOpen(!isOpen)}
-					disabled={isSaving}
-					className="px-4 py-1.5 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[200px] text-left flex items-center justify-between disabled:opacity-50"
-				>
-					<span className="truncate">
-						{holidaysInMonth.size > 0
-							? `${holidaysInMonth.size} holiday${holidaysInMonth.size !== 1 ? "s" : ""} this month`
-							: "Select holidays"}
-					</span>
-					<svg
-						className={`w-4 h-4 transition-transform ${
-							isOpen ? "rotate-180" : ""
-						}`}
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						aria-hidden="true"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M19 9l-7 7-7-7"
-						/>
-					</svg>
-				</button>
+		<Popover open={isOpen} onOpenChange={setIsOpen}>
+			<PopoverTrigger asChild>
+				<Button variant="outline" disabled={isSaving}>
+					{holidaysInMonth.size > 0
+						? `${holidaysInMonth.size} holiday${holidaysInMonth.size !== 1 ? "s" : ""} this month`
+						: "Select holidays"}
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="w-96 p-0" align="start">
+				<Card className="border-0 shadow-none">
+					<CardHeader>
+						<CardTitle className="text-sm">
+							Select Holidays for{" "}
+							{new Date(year, month).toLocaleDateString("en-US", {
+								month: "long",
+								year: "numeric",
+							})}
+						</CardTitle>
+					</CardHeader>
+					<CardContent className="pt-0">
+						<div className="grid grid-cols-7 gap-1">
+							{/* Day headers - Monday first */}
+							{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+								<div
+									key={day}
+									className="text-xs font-semibold text-center text-muted-foreground p-1"
+								>
+									{day}
+								</div>
+							))}
 
-				{isOpen && (
-					<div className="absolute top-full left-0 mt-1 w-96 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg shadow-lg z-50 max-h-[600px] overflow-y-auto">
-						<div className="p-4">
-							<h3 className="text-sm font-semibold text-black dark:text-zinc-50 mb-3">
-								Select Holidays for{" "}
-								{new Date(year, month).toLocaleDateString("en-US", {
-									month: "long",
-									year: "numeric",
-								})}
-							</h3>
-							<div className="grid grid-cols-7 gap-1">
-								{/* Day headers - Monday first */}
-								{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-									(day) => (
-										<div
-											key={day}
-											className="text-xs font-semibold text-center text-zinc-600 dark:text-zinc-400 p-1"
-										>
-											{day}
-										</div>
-									),
-								)}
+							{/* Empty cells for days before month start - adjusted for Monday first */}
+							{Array.from({
+								length: (daysInMonth[0].getDay() + 6) % 7,
+							}).map((_, idx) => {
+								// Create a unique key based on the month start date and offset
+								// This avoids using index directly while maintaining uniqueness
+								const offsetDate = new Date(year, month, -(idx + 1));
+								return (
+									<div
+										key={`empty-${formatDate(offsetDate)}`}
+										className="p-1"
+									/>
+								);
+							})}
 
-								{/* Empty cells for days before month start - adjusted for Monday first */}
-								{Array.from({
-									length: (daysInMonth[0].getDay() + 6) % 7,
-								}).map((_, idx) => (
-									<div key={`empty-${idx}`} className="p-1" />
-								))}
+							{/* Calendar days */}
+							{daysInMonth.map((day) => {
+								const dayStr = formatDate(day);
+								const isHoliday = pendingHolidays.has(dayStr);
+								const isWeekendDay = isWeekend(day);
+								const isToday = dayStr === formatDate(new Date());
 
-								{/* Calendar days */}
-								{daysInMonth.map((day) => {
-									const dayStr = formatDate(day);
-									const isHoliday = pendingHolidays.has(dayStr);
-									const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-									const isToday = dayStr === formatDate(new Date());
-
-									return (
-										<button
-											key={dayStr}
-											type="button"
-											onClick={() => handleToggleHoliday(day)}
-											disabled={isSaving}
-											className={`
-											p-2 text-xs rounded transition-colors
+								return (
+									<Button
+										key={dayStr}
+										type="button"
+										variant="ghost"
+										onClick={() => handleToggleHoliday(day)}
+										disabled={isSaving}
+										size="sm"
+										className={`
+											p-2 text-xs h-auto
 											${
 												isHoliday
 													? "bg-purple-200 dark:bg-purple-900/40 text-purple-900 dark:text-purple-100 font-semibold border-2 border-purple-400 dark:border-purple-600"
-													: isWeekend
+													: isWeekendDay
 														? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
-														: "bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+														: ""
 											}
 											${isToday ? "ring-2 ring-blue-400" : ""}
-											disabled:opacity-50 disabled:cursor-not-allowed
 										`}
-											title={
-												isHoliday
-													? "Click to remove holiday"
-													: "Click to add holiday"
-											}
-										>
-											{day.getDate()}
-										</button>
-									);
-								})}
+										title={
+											isHoliday
+												? "Click to remove holiday"
+												: "Click to add holiday"
+										}
+									>
+										{day.getDate()}
+									</Button>
+								);
+							})}
+						</div>
+						<div className="mt-4 pt-4 border-t">
+							<div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
+								<div className="flex items-center gap-1">
+									<div className="w-4 h-4 bg-purple-200 dark:bg-purple-900/40 border-2 border-purple-400 dark:border-purple-600 rounded" />
+									<span>Holiday</span>
+								</div>
+								<div className="flex items-center gap-1">
+									<div className="w-4 h-4 bg-red-50 dark:bg-red-900/20 rounded" />
+									<span>Weekend</span>
+								</div>
 							</div>
-							<div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
-								<div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 mb-4">
-									<div className="flex items-center gap-1">
-										<div className="w-4 h-4 bg-purple-200 dark:bg-purple-900/40 border-2 border-purple-400 dark:border-purple-600 rounded" />
-										<span>Holiday</span>
-									</div>
-									<div className="flex items-center gap-1">
-										<div className="w-4 h-4 bg-red-50 dark:bg-red-900/20 rounded" />
-										<span>Weekend</span>
-									</div>
-								</div>
-								<div className="flex items-center gap-2">
-									<button
-										type="button"
-										onClick={handleSave}
-										disabled={isSaving || !hasChanges}
-										className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-									>
-										{isSaving ? (
-											<>
-												<svg
-													className="animate-spin h-4 w-4"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-												>
-													<circle
-														className="opacity-25"
-														cx="12"
-														cy="12"
-														r="10"
-														stroke="currentColor"
-														strokeWidth="4"
-													></circle>
-													<path
-														className="opacity-75"
-														fill="currentColor"
-														d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-													></path>
-												</svg>
-												Saving...
-											</>
-										) : (
-											"Save"
-										)}
-									</button>
-									<button
-										type="button"
-										onClick={handleCancel}
-										disabled={isSaving || !hasChanges}
-										className="flex-1 px-4 py-2 bg-zinc-200 hover:bg-zinc-300 disabled:bg-zinc-100 disabled:cursor-not-allowed dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:disabled:bg-zinc-800 text-black dark:text-zinc-50 rounded-lg font-medium transition-colors"
-									>
-										Cancel
-									</button>
-								</div>
+							<div className="flex items-center gap-2">
+								<Button
+									type="button"
+									onClick={handleSave}
+									disabled={isSaving || !hasChanges}
+									className="flex-1"
+								>
+									{isSaving ? (
+										<>
+											<Loader2 className="animate-spin h-4 w-4 mr-2" />
+											Saving...
+										</>
+									) : (
+										"Save"
+									)}
+								</Button>
+								<Button
+									type="button"
+									onClick={handleCancel}
+									disabled={isSaving || !hasChanges}
+									variant="secondary"
+									className="flex-1"
+								>
+									Cancel
+								</Button>
 							</div>
 						</div>
-					</div>
-				)}
-			</div>
-		</div>
+					</CardContent>
+				</Card>
+			</PopoverContent>
+		</Popover>
 	);
 }

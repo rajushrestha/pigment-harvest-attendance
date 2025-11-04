@@ -25,30 +25,22 @@ interface AttendanceTableWithExportProps {
 			>;
 		};
 	}>;
-	allUsersForVisibility: Array<{
-		id: number;
-		name: string;
-		email: string;
-	}>;
 	daysInMonth: Date[];
 	holidaysSet: Set<string>;
 	month: string;
 	year: number;
 	dateRangeStart: string;
 	dateRangeEnd: string;
-	currentUserEmail?: string | null;
 }
 
 export function AttendanceTableWithExport({
 	allUsers,
-	allUsersForVisibility,
 	daysInMonth,
 	holidaysSet,
 	month,
 	year,
 	dateRangeStart,
 	dateRangeEnd,
-	currentUserEmail,
 }: AttendanceTableWithExportProps) {
 	const tableWrapperRef = useRef<{
 		tableRef: React.RefObject<HTMLDivElement>;
@@ -80,12 +72,10 @@ export function AttendanceTableWithExport({
 		<AttendanceTable
 			ref={tableWrapperRef}
 			allUsers={allUsers}
-			allUsersForVisibility={allUsersForVisibility}
 			daysInMonth={daysInMonth}
 			holidaysSet={holidaysSet}
 			dateRangeStart={dateRangeStart}
 			dateRangeEnd={dateRangeEnd}
-			currentUserEmail={currentUserEmail}
 			exportButtons={
 				refsReady &&
 				tableWrapperRef.current && (

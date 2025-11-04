@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { Button } from "@/components/ui/button";
+import { FileDown, Download, Loader2 } from "lucide-react";
+import { ButtonGroup } from "./ui/button-group";
 
 interface ExportButtonsProps {
 	tableRef: React.RefObject<HTMLDivElement>;
@@ -444,71 +447,29 @@ export function ExportButtons({
 	};
 
 	return (
-		<div className="flex items-center gap-2">
-			<button
+		<ButtonGroup>
+			<Button
 				type="button"
 				onClick={exportToPDF}
 				disabled={isExportingPDF || !refsReady}
-				className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+				variant="outline"
+				size="sm"
 				title="Export as PDF"
 			>
-				<svg
-					className={`w-4 h-4 ${isExportingPDF ? "animate-spin" : ""}`}
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-					aria-hidden="true"
-				>
-					{isExportingPDF ? (
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-						/>
-					) : (
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-						/>
-					)}
-				</svg>
+				{isExportingPDF ? <Loader2 className="animate-spin" /> : <FileDown />}
 				<span>{isExportingPDF ? "Exporting..." : "Export PDF"}</span>
-			</button>
-			<button
+			</Button>
+			<Button
 				type="button"
 				onClick={exportToCSV}
 				disabled={isExportingCSV || !refsReady}
-				className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-black dark:text-zinc-50 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+				variant="outline"
+				size="sm"
 				title="Export as Google Sheets (CSV)"
 			>
-				<svg
-					className={`w-4 h-4 ${isExportingCSV ? "animate-spin" : ""}`}
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-					aria-hidden="true"
-				>
-					{isExportingCSV ? (
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-						/>
-					) : (
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-						/>
-					)}
-				</svg>
+				{isExportingCSV ? <Loader2 className="animate-spin" /> : <Download />}
 				<span>{isExportingCSV ? "Exporting..." : "Export CSV"}</span>
-			</button>
-		</div>
+			</Button>
+		</ButtonGroup>
 	);
 }

@@ -2,7 +2,6 @@
 
 import { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { UserRow } from "./UserRow";
-import { UserVisibilityRow } from "./UserVisibilityRow";
 import { Legend } from "./Legend";
 import { formatDate, isWeekend } from "@/lib/utils";
 import type { TimeEntryWithOvertime } from "@/lib/timeEntriesCache";
@@ -27,16 +26,10 @@ interface AttendanceTableProps {
 			>;
 		};
 	}>;
-	allUsersForVisibility: Array<{
-		id: number;
-		name: string;
-		email: string;
-	}>;
 	daysInMonth: Date[];
 	holidaysSet: Set<string>;
 	dateRangeStart: string;
 	dateRangeEnd: string;
-	currentUserEmail?: string | null;
 	exportButtons?: React.ReactNode;
 }
 
@@ -50,12 +43,10 @@ export const AttendanceTable = forwardRef<
 	(
 		{
 			allUsers,
-			allUsersForVisibility,
 			daysInMonth,
 			holidaysSet,
 			dateRangeStart,
 			dateRangeEnd,
-			currentUserEmail,
 			exportButtons,
 		},
 		ref,
@@ -138,15 +129,6 @@ export const AttendanceTable = forwardRef<
 									filters={filters}
 								/>
 							))}
-							<UserVisibilityRow
-								users={allUsersForVisibility}
-								daysInMonth={daysInMonth}
-								currentUserEmail={currentUserEmail}
-								onVisibilityChange={() => {
-									// Trigger a page refresh to update visible users
-									window.location.reload();
-								}}
-							/>
 						</tbody>
 					</table>
 				</div>

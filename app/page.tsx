@@ -20,6 +20,7 @@ import { getCacheInfo, getAllUserVisibility } from "@/lib/db";
 import { getAuthenticatedEmail } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
+import { UserVisibilityButton } from "@/components/UserVisibilityRow";
 
 interface TimeEntryGroup {
 	date: string;
@@ -271,23 +272,31 @@ export default async function AttendancePage({
 							initialHolidays={holidayDates}
 						/>
 					</Suspense>
+					<Suspense
+						fallback={
+							<div className="text-zinc-600 dark:text-zinc-400">Loading...</div>
+						}
+					>
+						<UserVisibilityButton
+							users={allActiveUsers.map((user) => ({
+								id: user.id,
+								name: `${user.first_name} ${user.last_name}`,
+								email: user.email,
+							}))}
+							currentUserEmail={email}
+						/>
+					</Suspense>
 				</div>
 			</div>
 
 			<AttendanceTableWithExport
 				allUsers={allUsers}
-				allUsersForVisibility={allActiveUsers.map((user) => ({
-					id: user.id,
-					name: `${user.first_name} ${user.last_name}`,
-					email: user.email,
-				}))}
 				daysInMonth={daysInMonth}
 				holidaysSet={holidaysSet}
 				month={monthNames[month]}
 				year={year}
 				dateRangeStart={monthStart}
 				dateRangeEnd={monthEnd}
-				currentUserEmail={email}
 			/>
 		</div>
 	);

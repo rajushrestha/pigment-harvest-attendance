@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface LegendProps {
 	onFilterChange: (filters: {
@@ -46,20 +48,23 @@ export function Legend({ onFilterChange, exportButtons }: LegendProps) {
 	const hasActiveFilters = Object.values(filters).some((val) => val);
 
 	return (
-		<div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+		<div className="py-10">
 			<div className="flex flex-wrap items-center justify-between gap-4 text-sm">
-				<div className="flex flex-wrap items-center gap-4">
-					<button
+				<div className="flex flex-wrap items-center gap-2">
+					<Button
 						type="button"
+						variant="ghost"
+						size="sm"
 						onClick={() => toggleFilter("holiday")}
-						className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+						className={cn(
+							"border border-transparent",
 							filters.holiday
-								? "bg-purple-100 dark:bg-purple-900/30 border-2 border-purple-400 dark:border-purple-600"
-								: "border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						}`}
+								? "bg-purple-100 dark:bg-purple-900/30 border-purple-400 dark:border-purple-600"
+								: "hover:bg-zinc-100 dark:hover:bg-zinc-800",
+						)}
 					>
 						<div
-							className="w-6 h-6 rounded"
+							className="size-4 rounded"
 							style={{
 								backgroundColor: "rgba(192, 132, 252, 0.3)",
 							}}
@@ -67,34 +72,40 @@ export function Legend({ onFilterChange, exportButtons }: LegendProps) {
 						<span className="text-zinc-700 dark:text-zinc-300 font-medium">
 							Holiday
 						</span>
-					</button>
+					</Button>
 
-					<button
+					<Button
 						type="button"
+						variant="ghost"
+						size="sm"
 						onClick={() => toggleFilter("weekend")}
-						className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+						className={cn(
+							"border border-transparent",
 							filters.weekend
-								? "bg-red-100 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-600"
-								: "border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						}`}
+								? "bg-red-100 dark:bg-red-900/30 border-red-400 dark:border-red-600"
+								: " hover:bg-zinc-100 dark:hover:bg-zinc-800",
+						)}
 					>
-						<div className="w-6 h-6 rounded bg-red-50 dark:bg-red-900/20" />
+						<div className="size-4 rounded bg-red-50 dark:bg-red-900/20" />
 						<span className="text-zinc-700 dark:text-zinc-300 font-medium">
 							Weekend
 						</span>
-					</button>
+					</Button>
 
-					<button
+					<Button
 						type="button"
+						variant="ghost"
+						size="sm"
 						onClick={() => toggleFilter("worked")}
-						className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+						className={cn(
+							"border border-transparent",
 							filters.worked
-								? "bg-green-100 dark:bg-green-900/30 border-2 border-green-400 dark:border-green-600"
-								: "border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						}`}
+								? "bg-green-100 dark:bg-green-900/30 border-green-400 dark:border-green-600"
+								: " hover:bg-zinc-100 dark:hover:bg-zinc-800",
+						)}
 					>
 						<div
-							className="w-6 h-6 rounded"
+							className="size-4 rounded"
 							style={{
 								backgroundColor: "rgba(34, 197, 94, 0.3)",
 							}}
@@ -102,39 +113,45 @@ export function Legend({ onFilterChange, exportButtons }: LegendProps) {
 						<span className="text-zinc-700 dark:text-zinc-300 font-medium">
 							Worked (8h = full green)
 						</span>
-					</button>
+					</Button>
 
-					<button
+					<Button
 						type="button"
+						variant="ghost"
+						size="sm"
 						onClick={() => toggleFilter("absent")}
-						className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+						className={cn(
+							"border border-transparent",
 							filters.absent
-								? "bg-red-100 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-600"
-								: "border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						}`}
+								? "bg-red-100 dark:bg-red-900/30 border-red-400 dark:border-red-600"
+								: " hover:bg-zinc-100 dark:hover:bg-zinc-800",
+						)}
 					>
 						<div
-							className="w-6 h-6 rounded"
+							className="size-4 rounded"
 							style={{
 								backgroundColor: "rgba(239, 68, 68, 0.15)",
 							}}
 						/>
 						<span className="text-zinc-700 dark:text-zinc-300 font-medium">
-							Absent (0h on working day)
+							Absent
 						</span>
-					</button>
+					</Button>
 
-					<button
+					<Button
 						type="button"
+						variant="ghost"
+						size="sm"
 						onClick={() => toggleFilter("overtime")}
-						className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+						className={cn(
+							"border border-transparent",
 							filters.overtime
-								? "bg-orange-100 dark:bg-orange-900/30 border-2 border-orange-400 dark:border-orange-600"
-								: "border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						}`}
+								? "bg-orange-100 dark:bg-orange-900/30 border-orange-400 dark:border-orange-600"
+								: " hover:bg-zinc-100 dark:hover:bg-zinc-800",
+						)}
 					>
 						<div
-							className="w-6 h-6 rounded"
+							className="size-4 rounded"
 							style={{
 								backgroundColor: "rgba(251, 146, 60, 0.3)",
 							}}
@@ -142,16 +159,17 @@ export function Legend({ onFilterChange, exportButtons }: LegendProps) {
 						<span className="text-zinc-700 dark:text-zinc-300 font-medium">
 							Overtime
 						</span>
-					</button>
+					</Button>
 
 					{hasActiveFilters && (
-						<button
+						<Button
 							type="button"
+							variant="outline"
+							size="sm"
 							onClick={clearFilters}
-							className="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 rounded-lg transition-colors border border-zinc-300 dark:border-zinc-600"
 						>
 							Clear Filters
-						</button>
+						</Button>
 					)}
 				</div>
 				{exportButtons && (

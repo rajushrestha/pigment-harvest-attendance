@@ -3,6 +3,17 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	CardDescription,
+} from "@/components/ui/card";
+import { ArrowLeft, Loader2 } from "lucide-react";
 
 function LoginForm() {
 	const router = useRouter();
@@ -63,118 +74,78 @@ function LoginForm() {
 
 	return (
 		<div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center p-4">
-			<div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-8 max-w-md w-full">
-				<div className="mb-4">
-					<Link
-						href="/welcome"
-						className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 flex items-center gap-2"
-					>
-						<svg
-							className="w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
+			<Card className="w-full max-w-md shadow-lg">
+				<CardContent className="px-10">
+					<div className="mb-4">
+						<Button
+							asChild
+							variant="ghost"
+							size="sm"
+							className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
 						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M15 19l-7-7 7-7"
+							<Link href="/welcome">
+								<ArrowLeft className="w-4 h-4 mr-2" />
+								Back to Welcome
+							</Link>
+						</Button>
+					</div>
+					<CardHeader className="p-0 mb-6">
+						<CardTitle className="text-3xl">Hey There!</CardTitle>
+						<CardDescription className="text-base">
+							Sign in with your email to access whatever is there.
+						</CardDescription>
+					</CardHeader>
+
+					<form onSubmit={handleSubmit} className="space-y-4">
+						<div className="space-y-2">
+							<label
+								htmlFor="email"
+								className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 inline-block"
+							>
+								Email Address
+							</label>
+							{/** biome-ignore lint/correctness/useUniqueElementIds: Not needed for this use case */}
+							<Input
+								type="email"
+								id="email"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								required
+								disabled={isLoading}
+								placeholder="your.email@example.com"
 							/>
-						</svg>
-						Back to Welcome
-					</Link>
-				</div>
-				<h1 className="text-3xl font-bold text-black dark:text-zinc-50 mb-2">
-					Hey There!
-				</h1>
-				<p className="text-zinc-600 dark:text-zinc-400 mb-6">
-					Sign in with your email to access whatever is there.
-				</p>
+						</div>
 
-				{error && (
-					<div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-						<p className="text-sm text-red-700 dark:text-red-400">
-							{errorMessages[error] || "An error occurred. Please try again."}
-						</p>
-					</div>
-				)}
+						<Button type="submit" disabled={isLoading} className="w-full">
+							{isLoading ? (
+								<>
+									<Loader2 className="animate-spin h-5 w-5 mr-2" />
+									Sending...
+								</>
+							) : (
+								"Send Magic Link"
+							)}
+						</Button>
+					</form>
 
-				{message && (
-					<div
-						className={`mb-4 p-4 rounded-lg ${
-							message.type === "success"
-								? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
-								: "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
-						}`}
-					>
-						<p
-							className={`text-sm ${
-								message.type === "success"
-									? "text-green-700 dark:text-green-400"
-									: "text-red-700 dark:text-red-400"
-							}`}
+					{error && (
+						<Alert variant="destructive" className="mt-4">
+							<AlertDescription>
+								{errorMessages[error] || "An error occurred. Please try again."}
+							</AlertDescription>
+						</Alert>
+					)}
+
+					{message && (
+						<Alert
+							variant={message.type === "success" ? "default" : "destructive"}
+							className="mt-4"
 						>
-							{message.text}
-						</p>
-					</div>
-				)}
-
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<div>
-						<label
-							htmlFor="email"
-							className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
-						>
-							Email Address
-						</label>
-						<input
-							type="email"
-							id="email"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							required
-							disabled={isLoading}
-							className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-							placeholder="your.email@example.com"
-						/>
-					</div>
-
-					<button
-						type="submit"
-						disabled={isLoading}
-						className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-					>
-						{isLoading ? (
-							<>
-								<svg
-									className="animate-spin h-5 w-5"
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-								>
-									<circle
-										className="opacity-25"
-										cx="12"
-										cy="12"
-										r="10"
-										stroke="currentColor"
-										strokeWidth="4"
-									></circle>
-									<path
-										className="opacity-75"
-										fill="currentColor"
-										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-									></path>
-								</svg>
-								Sending...
-							</>
-						) : (
-							"Send Magic Link"
-						)}
-					</button>
-				</form>
-			</div>
+							<AlertDescription>{message.text}</AlertDescription>
+						</Alert>
+					)}
+				</CardContent>
+			</Card>
 		</div>
 	);
 }
