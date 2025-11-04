@@ -31,16 +31,28 @@ export async function verifyAuthToken(
 	token: string,
 ): Promise<AuthTokenPayload | null> {
 	try {
+		// Validate token is not empty
+		if (!token || typeof token !== "string" || token.trim().length === 0) {
+			console.error("Token is empty or invalid");
+			return null;
+		}
+
 		const { payload } = await jwtVerify(token, SECRET_KEY);
 		const exp = (payload.exp as number) * 1000; // Convert to milliseconds
 
 		// Check if token is expired
 		if (exp < Date.now()) {
+			console.error("Token expired:", {
+				exp,
+				now: Date.now(),
+				diff: Date.now() - exp,
+			});
 			return null;
 		}
 
 		// Validate email exists in payload
 		if (!payload.email || typeof payload.email !== "string") {
+			console.error("Invalid payload - missing email:", payload);
 			return null;
 		}
 
@@ -49,6 +61,11 @@ export async function verifyAuthToken(
 			exp,
 		};
 	} catch (error) {
+		console.error("JWT verification error:", {
+			error: error instanceof Error ? error.message : String(error),
+			tokenLength: token?.length,
+			tokenPrefix: token?.substring(0, 20),
+		});
 		return null;
 	}
 }
