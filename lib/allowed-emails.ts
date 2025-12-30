@@ -4,7 +4,10 @@
 
 const DEFAULT_ALLOWED_EMAILS: string[] = [
 	"raju@lunover.com",
-  "officialprabin@gmail.com"
+  "officialprabin@gmail.com",
+  "ritesh@pigment.se",
+  "ronash@pigment.se",
+  "krishna@pigment.se",
 ];
 
 export function getAllowedEmails(): string[] {
